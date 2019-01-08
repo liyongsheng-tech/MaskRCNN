@@ -19,4 +19,6 @@ These are the most important aspects of an RCNN. They are also a source of bottl
 [Coco](http://cocodataset.org/#home)
 
 ### Paper
-https://arxiv.org/abs/1703.06870
+[RCNN](https://arxiv.org/abs/1311.2524)
+[Fast RCNN](https://arxiv.org/abs/1504.08083)
+[Mask RCNN](https://arxiv.org/abs/1703.06870)
