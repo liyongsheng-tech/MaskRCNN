@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw
 
-def OpenImage(imgJson, rootPath):
+def openImage(imgJson, rootPath):
     '''Opens PIL image given path.
     
     :param imgJson: JSON which contains image information
