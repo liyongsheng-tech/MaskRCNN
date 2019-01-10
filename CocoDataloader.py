@@ -1,8 +1,9 @@
 from pycocotools.coco import COCO
 from tqdm import tqdm
 import numpy as np
+from torch.utils.data import Dataset
 
-class CocoLoader:
+class CocoLoader(Dataset):
 
     # Fallback location of coco dataset directory.
     DEFAULT_DIR = '../DS_coco'
@@ -38,6 +39,8 @@ class CocoLoader:
         Category Ids are not sequential. Hence we need to add a mapping from the category Ids to 
         indexes for a normal list. This will be very helpful during one hot encoding.
         Needs to be called after _getCategoryIds
+
+        Creates a new var called catToIdxMap which maps category ids to indexes. 
         '''
 
         self.catToIdxMap = {}
@@ -64,6 +67,8 @@ class CocoLoader:
         '''Builds an internal mapping between category IDs and names.
         
         Needs to be called after _getCategoryIds        
+
+        Creates self.catIdNameMap, a mapping between IDs to category names
         '''
 
         catMap = self.coco.loadCats(self.categoryIds)
@@ -74,6 +79,7 @@ class CocoLoader:
     def _getImageIds(self):
         '''Get list of image Ids
         
+        Creates self.imageIds which contains the list of images.
         '''
 
         self.imageIds = self.coco.getImgIds()
@@ -83,7 +89,9 @@ class CocoLoader:
         
         Image_Id is mapped to filepath and annotations in the image. Annotations include category_id,
         bounding box and segmentations.
-        
+
+        Creates self.imageDataList which contains a list of dictionaries. Each dict contains mappings
+        for images to their annotations.
         '''
 
         # A list with image data as a map for each element
@@ -104,3 +112,14 @@ class CocoLoader:
             imgMap['filePath'] = filePath
             imgMap['annotations'] = annotations
             self.imageDataList.append(imgMap)
+    
+    def __len__(self):
+        '''Returns length of dataset
+        
+        :return: length of dataset
+        :rtype: int
+        '''
+        return len(self.imageDataList)
+    
+    def __getitem__(self, idx):
+        return 
