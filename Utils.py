@@ -1,19 +1,16 @@
 from PIL import Image, ImageDraw
 import math
 
-def openImage(imgJson, rootPath):
+def openImage(imgPath):
     '''Opens PIL image given path.
     
-    :param imgJson: JSON which contains image information
-    :type imgJson: JSON
-    :param rootPath: Path to image
-    :type rootPath: String
+    :param imgPath:  Path to image
+    :type imgPath: String
     :return: Image read from path
     :rtype: PIL image
     '''
 
-    path = rootPath + '/' + imgJson[0]['file_name']
-    im = Image.open(path)
+    im = Image.open(imgPath)
     return im
 
 def calcBoundingBoxParams(bbox, anchorBBox):
@@ -51,24 +48,23 @@ def getBoundingBoxes(annotations):
 
     bbox = []
     for annotation in annotations:
-        bbox.append(annotations['bbox'])
+        bbox.append(annotation['bbox'])
     return bbox
 
-def drawBoundingBox(img, annotations):
+def drawBoundingBox(img, bboxList):
     '''Draw bounding boxes around objects in given image. Done in place.
     
     :param img: Image which contains objects
     :type img: PIL Image
-    :param annotations: COCO Annotations which contain bounding box values
-    :type annotations: JSON
+    :param bboxList: list of bounding boxes
+    :type bboxList: list of 4 tuples
     :return: Image with bounding boxes drawn on it.
     :rtype: PIL Image
     '''
 
     draw = ImageDraw.Draw(img)
     x1, y1, x2, y2 = 0, 0, 0, 0
-    for annotation in annotations:
-        bbox = annotation['bbox']
+    for bbox in bboxList:
         x1 = int(bbox[0])
         y1 = int(bbox[1])
     
