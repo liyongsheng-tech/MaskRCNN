@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+import math
 
 def openImage(imgJson, rootPath):
     '''Opens PIL image given path.
@@ -15,20 +16,43 @@ def openImage(imgJson, rootPath):
     im = Image.open(path)
     return im
 
-def getCategoryName(catId, categoryJson):
-    '''Returns the name of the category, given the category ID
+def calcBoundingBoxParams(bbox, anchorBBox):
+    '''Calculate the regressor parameters, given a bounding box
     
-    :param catId: Category ID
-    :type catId: int
-    :param categoryJson: JSON containing all categories
-    :type categoryJson: JSON
-    :return: name of Category
-    :rtype: String
+    The 4 params, tx, ty, tw and th are not the same as the bbox.
+    The params are as given in the Faster RCNN paper. 
+    
+    :param bbox: bbox values, (x, y, w, h)
+    :type bbox: Tuple of floats
+    :param anchorBBox: Anchor bbox values (xa, ya, wa, ha)
+    :type anchorBBox: Tuple of floats
+    :return: set of 4 parameters
+    :rtype: 4 tuple of floats
+    '''
+    x, y, w, h = bbox
+    xa, ya, wa, ha = anchorBBox
+
+    tx = (x - xa) / float(wa)
+    ty = (y - ya) / float(ha)
+    tw = math.log(float(w / wa))
+    th = math.log(float(h / ha))
+
+    return (tx, ty, tw, th)
+
+
+def getBoundingBoxes(annotations):
+    '''Parse bounding boxes from given annotations
+    
+    :param annotations: annotations containing bounding boxes
+    :type annotations: dict
+    :return: bounding box coords
+    :rtype: list
     '''
 
-    for cat in categoryJson:
-        if cat['id'] == catId:
-            return cat['name']
+    bbox = []
+    for annotation in annotations:
+        bbox.append(annotations['bbox'])
+    return bbox
 
 def drawBoundingBox(img, annotations):
     '''Draw bounding boxes around objects in given image. Done in place.
