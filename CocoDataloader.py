@@ -1,7 +1,9 @@
+import numpy as np
+import Utils
+
+from torch.utils.data import Dataset
 from pycocotools.coco import COCO
 from tqdm import tqdm
-import numpy as np
-from torch.utils.data import Dataset
 
 class CocoLoader(Dataset):
 
@@ -16,7 +18,7 @@ class CocoLoader(Dataset):
     def __init__(self, dataDir=None, dataType=None):
         self.dataDir = dataDir if dataDir is not None else CocoLoader.DEFAULT_DIR
         self.dataType = dataType if dataType is not None else CocoLoader.VAL_TYPE
-        self.rootPath = self.dataDir + self.dataType
+        self.rootPath = self.dataDir + '/' + self.dataType
 
         annFile = '{}/annotations/instances_{}.json'.format(self.dataDir, self.dataType)
         self.coco = COCO(annFile)
@@ -122,4 +124,9 @@ class CocoLoader(Dataset):
         return len(self.imageDataList)
     
     def __getitem__(self, idx):
-        return 
+        imgData = self.imageDataList[idx]
+
+        actualImg = Utils.openImage(imgData['filePath'])
+        bboxes = Utils.getBoundingBoxes(imgData['annotations'])
+
+        return bboxes, actualImg
