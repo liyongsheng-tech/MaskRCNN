@@ -4,6 +4,7 @@ import Utils
 from torch.utils.data import Dataset
 from pycocotools.coco import COCO
 from tqdm import tqdm
+from torchvision import transforms
 
 class CocoLoader(Dataset):
 
@@ -12,13 +13,26 @@ class CocoLoader(Dataset):
 
     # Fallback COCO datatype
     VAL_TYPE = 'val2017'
-
     TRAIN_TYPE = 'train2017'
 
-    def __init__(self, dataDir=None, dataType=None):
+    TRANSFORMS = transforms.Compose([
+        transforms.RandomResizedCrop((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                             std=[0.229, 0.224, 0.225])
+    ])
+
+    def __init__(self, dataDir=None, dataType=None, transforms=None):
+        '''
+
+        :param dataDir: Root directory for the dataset
+        :param dataType: Train or validation set
+        :param transforms: Transforms.Compose
+        '''
         self.dataDir = dataDir if dataDir is not None else CocoLoader.DEFAULT_DIR
         self.dataType = dataType if dataType is not None else CocoLoader.VAL_TYPE
         self.rootPath = self.dataDir + '/' + self.dataType
+        self.transforms = CocoLoader.TRANSFORMS if transforms is None else transforms
 
         annFile = '{}/annotations/instances_{}.json'.format(self.dataDir, self.dataType)
         self.coco = COCO(annFile)
@@ -127,6 +141,7 @@ class CocoLoader(Dataset):
         imgData = self.imageDataList[idx]
 
         actualImg = Utils.openImage(imgData['filePath'])
+        actualImg = self.transforms(actualImg)
         bboxes = Utils.getBoundingBoxes(imgData['annotations'])
 
         return bboxes, actualImg
